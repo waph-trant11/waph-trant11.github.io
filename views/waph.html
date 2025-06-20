@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>WAPH | Thien Ngoc Tran</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+      body {
+        background-color: powderblue;
+      }
+      h1 {
+        color: blue;
+      }
+      .button {
+        background-color: green;
+        border: none;
+        color: white;
+        padding: 5px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 12px;
+        margin: 4px 2px;
+        cursor: pointer;
+      }
+      .round {
+        border-radius: 8px;
+      }
+      #response {
+        background-color: orange;
+      }
+    </style>
+    <link rel="stylesheet" href="https://waph-phung.github.io/style1.css" />
+  </head>
+  <body>
+    <div id="top">
+      <div>
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <div>
+            <h1 style="color: blue">Web Application Programming and Hacking</h1>
+            <h2>This page is dedicated for WAPH course</h2>
+            <h3>Instructor: Dr. Phu Phung</h3>
+          </div>
+          <div>
+            <a href="/index.html" class="button round"
+              >← Back to Profile Home</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="menubar">
+      <h3>Student: Thien Tran</h3>
+      <img src="/images/MyPortrait.png" alt="My Headshot" width="50" />
+      <div id="digit-clock"></div>
+      <canvas
+        id="analog-clock"
+        width="150"
+        height="150"
+        style="background-color: #999"
+      ></canvas>
+    </div>
+    <div id="main">
+      <p>A Simple HTML page</p>
+      Using the <a href="https://www.w3schools.com/html"> W3Schools template</a>
+    </div>
+
+    <br />
+    <b>Experiments with JavaScript code</b><br />
+    <i>Inlined JavaScript</i>
+    <div id="date" onclick="document.getElementById('date').innerHTML = Date()">
+      Click here to show Date()
+    </div>
+    <div id="email" onclick="showhideEmail()">Show my email</div>
+    <i>jokeAPI</i>
+    <input
+      class="button round"
+      type="button"
+      value="joke?"
+      onclick="jokeAPIfetch()"
+    />
+    <div id="jokeResponse"></div>
+    <br />
+    <i>Agify.io</i>
+    <form id="ageForm">
+      <label for="name">Enter your name:</label>
+      <input type="text" id="name" name="name" required />
+      <input type="submit" value="Predict Age" />
+    </form>
+    <div id="age-result"></div>
+
+    <script src="email.js"></script>
+    <script src="https://waph-phung.github.io/clock.js"></script>
+    <script>
+      var canvas = document.getElementById("analog-clock");
+      var ctx = canvas.getContext("2d");
+      var radius = canvas.height / 2;
+
+      ctx.translate(radius, radius);
+      radius = radius * 0.9;
+      setInterval(drawClock, 1000);
+
+      function drawClock() {
+        drawFace(ctx, radius);
+        drawNumbers(ctx, radius);
+        drawTime(ctx, radius);
+      }
+
+      function displayTime() {
+        document.getElementById("digit-clock").innerHTML =
+          "Current time: " + new Date();
+      }
+      setInterval(displayTime, 500);
+
+      function jQueryAjax() {
+        var input = $("#data").val();
+        if (input.length == 0) return;
+        $.get("echo.php?data=" + input, function (result) {
+          $("#response").text("Response from server:" + result);
+        });
+        $("#data").val("");
+      }
+
+      async function jokeAPIfetch() {
+        const jokeAPI_res = await fetch(
+          "https://v2.jokeapi.dev/joke/Programming?type=single"
+        );
+        const result = await jokeAPI_res.json();
+        $("#jokeResponse").text(
+          "A programming joke of the day: " + result.joke
+        );
+      }
+
+      var shown = false;
+      function showhideEmail() {
+        if (shown) {
+          document.getElementById("email").innerHTML = "Show my email";
+          shown = false;
+        } else {
+          var myemail =
+            "<a href='mailto:trant11" +
+            "@" +
+            "udayton.edu'>trant11" +
+            "@" +
+            "udayton.edu</a>";
+          document.getElementById("email").innerHTML = myemail;
+          shown = true;
+        }
+      }
+
+      document
+        .getElementById("ageForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const name = document.getElementById("name").value;
+          fetch(`https://api.agify.io/?name=${encodeURIComponent(name)}`)
+            .then((response) => response.json())
+            .then((data) => {
+              document.getElementById(
+                "age-result"
+              ).innerText = `Predicted Age for "${data.name}": ${data.age}`;
+            })
+            .catch((error) => {
+              document.getElementById(
+                "age-result"
+              ).innerText = `Error fetching data`;
+              console.error("Error: ", error);
+            });
+        });
+    </script>
+  </body>
+</html>
