@@ -60,11 +60,9 @@
             ></a>
           </div>
           <br/>
+          <p id="visit-message" style="text-align:center; font-weight:bold;"></p>
           <div style="margin-top: 10px;">
-            <img 
-              src="https://s01.flagcounter.com/mini/PV9k/bg_FFFFFF/txt_000000/border_CCCCCC/flags_0/" 
-              alt="Flag Counter"
-              style="display: block; width: auto; height: auto; max-width: 100%; background-color: white; padding: 4px; border-radius: 6px;" />
+            <img src="https://s01.flagcounter.com/mini/PV9k/bg_FFFFFF/txt_000000/border_CCCCCC/flags_0/" alt="Flag Counter" style="display: block; width: auto; height: auto; max-width: 100%; background-color: black; padding: 4px; border-radius: 6px;" />
           </div>
           <br/>
           <h3>Curious what holiday falls on a certain day?</h3>
@@ -514,6 +512,38 @@
           nav.classList.toggle("show");
         });
       });
+
+      // Set a cookie with name, value, and expiration in days
+      function setCookie(name, value, days) {
+        const date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        document.cookie = `${name}=${value}; expires=${date.toUTCString()}; path=/`;
+      }
+
+      // Get a cookie value by name
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+      }
+
+      // Display message based on cookie
+      function showVisitMessage() {
+        const lastVisit = getCookie("lastVisit");
+        const now = new Date().toLocaleString();
+        const msgElement = document.getElementById("visit-message");
+
+        if (lastVisit) {
+          msgElement.textContent = `Welcome back! Your last visit was ${lastVisit}`;
+        } else {
+          msgElement.textContent = "Welcome to my homepage for the first time!";
+        }
+
+        // Update cookie with current time
+        setCookie("lastVisit", now, 365);
+      }
+
+      document.addEventListener("DOMContentLoaded", showVisitMessage);
 
     </script>    
     

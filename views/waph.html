@@ -32,6 +32,12 @@
       }
     </style>
     <link rel="stylesheet" href="https://waph-phung.github.io/style1.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
   </head>
   <body>
     <div id="top">
@@ -60,6 +66,10 @@
       <h3>Student: Thien Tran</h3>
       <img src="/images/MyPortrait.png" alt="My Headshot" width="50" />
       <div id="digit-clock"></div>
+      <div id="weather">
+        <p>🌤️ Current Weather</p>
+        <div id="weatherInfo">Loading...</div>
+      </div>
       <canvas
         id="analog-clock"
         width="150"
@@ -83,8 +93,8 @@
     <input
       class="button round"
       type="button"
-      value="joke?"
-      onclick="jokeAPIfetch()"
+      value="Get new joke"
+      onclick="manualJokeFetch()"
     />
     <div id="jokeResponse"></div>
     <br />
@@ -138,6 +148,25 @@
         );
       }
 
+      let jokeTimer = null;
+      // fetch new joke every 1 min
+      function startAutoJoke() {
+        if (jokeTimer !== null) {
+          clearInterval(jokeTimer);
+        }
+        jokeTimer = setInterval(jokeAPIfetch, 60000);
+      }
+      // manually fetch
+      function manualJokeFetch() {
+        jokeAPIfetch();
+        startAutoJoke();
+      }
+      // load on render
+      document.addEventListener("DOMContentLoaded", () => {
+        jokeAPIfetch();
+        startAutoJoke();
+      });
+
       var shown = false;
       function showhideEmail() {
         if (shown) {
@@ -175,6 +204,51 @@
               console.error("Error: ", error);
             });
         });
+
+      // free key
+      const weatherKey = "1a9a947121c046258e39c0fc1d79308d";
+
+      function fetchWeather(lat, lon) {
+        fetch(
+          `https://api.weatherbit.io/v2.0/current?lat=${lat}&lon=${lon}&key=${weatherKey}&units=I`
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            const w = data.data[0];
+            document.getElementById("weatherInfo").innerHTML = `
+              <p>Location: ${w.city_name}, ${w.state_code}, ${w.country_code}</p>
+              <p>Temperature: ${w.temp}°F (Feels like: ${w.app_temp}°F)</p>
+              <p>Condition: ${w.weather.description}</p>
+              <p>Wind: ${w.wind_spd} mph from the ${w.wind_cdir_full}</p>
+              <img src="https://www.weatherbit.io/static/img/icons/${w.weather.icon}.png" alt="${w.weather.description}" />
+            `;
+          })
+          .catch((err) => {
+            document.getElementById("weatherInfo").textContent =
+              "Unable to load weather data.";
+            console.error("Weather API error:", err);
+          });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+            (err) => {
+              console.warn(
+                "Geolocation failed, falling back to default location."
+              );
+              // fallback: Dayton, OH
+              fetchWeather(39.7589, -84.1916);
+            }
+          );
+        } else {
+          // fallback if geolocation is not supported
+          fetchWeather(39.7589, -84.1916);
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", fetchWeather);
     </script>
   </body>
 </html>
